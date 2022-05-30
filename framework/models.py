@@ -1,4 +1,5 @@
 from email.policy import default
+from tkinter import CASCADE
 from django.db import models
 from ordered_model.models import OrderedModelBase
 
@@ -8,6 +9,9 @@ class Resource(OrderedModelBase):
     # order model
     sort_order = models.PositiveIntegerField(editable=False, db_index=True, null=True)
     order_field_name = "sort_order"
+    # relatedTopic = models.ForeignKey('Topic', on_delete=models.CASCADE, null=True)
+    # order_with_respect_to = "relatedTopic"
+    topic = models.ForeignKey('Topic', on_delete=models.CASCADE, null=True)
     class Meta:
         ordering = ("sort_order",)
 
@@ -26,10 +30,21 @@ class Topic(OrderedModelBase):
 
     # topic data fields
     topic_name = models.CharField(max_length=100)
-    subtopics = models.ManyToManyField("self", blank=True,  related_name="Subtopics", symmetrical=False)
-    resources = models.ManyToManyField(Resource, blank=True)
+    # subtopics = models.ManyToManyField("self", blank=True,  related_name="Subtopics", symmetrical=False)
+    # resources = models.ManyToManyField(Resource, blank=True)
     def __str__(self):
         return self.topic_name
+
+class ResourceToTopic(OrderedModelBase):
+
+    sort_order = models.PositiveIntegerField(editable=False, db_index=True, null=True)
+    order_field_name = "sort_order"
+    resource = models.ForeignKey('Resource', on_delete=models.CASCADE)
+    topic = models.ForeignKey('Topic', on_delete=models.CASCADE)
+    order_with_respect_to = 'topic'
+
+    class Meta:
+        ordering = ('topic', 'sort_order',)
 
 class Skill(OrderedModelBase):
   
