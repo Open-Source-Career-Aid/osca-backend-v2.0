@@ -1,19 +1,16 @@
 from colorsys import ONE_THIRD
+from dataclasses import field
 from email.policy import default
 from tkinter import CASCADE
 from turtle import onclick
 from django.db import models
 from ordered_model.models import OrderedModel
 
-class Resource(models.Model):
-    link = models.TextField(blank=False)
-    # relatedTopic = models.ForeignKey('Topic', on_delete=models.CASCADE, null=True)
+#--------------------------------------------------------------------------------------------------------------------
+# through models
+#--------------------------------------------------------------------------------------------------------------------
 
-class Topic(models.Model):
-    topicName = models.CharField(max_length=100, blank=False)
-    relatedResources = models.ManyToManyField('Resource', through='ResourceThroughTopic', blank=True)
-    relatedTopics = models.ManyToManyField('self', through='TopicThroughTopic', blank=True, related_name='relatedTopics')
-
+# defines a table for storing connections between the resources and topics for defining order
 class ResourceThroughTopic(OrderedModel):
     topic = models.ForeignKey('Topic', on_delete=models.CASCADE)
     resources = models.ForeignKey('Resource', on_delete=models.CASCADE)
@@ -22,6 +19,7 @@ class ResourceThroughTopic(OrderedModel):
     class Meta:
         ordering = ('topic', 'order',)
 
+# defines a table for storing connections of topics with other topics in a topic-subtopic relationship for defining order
 class TopicThroughTopic(OrderedModel):
     topic = models.ForeignKey('Topic', on_delete=models.CASCADE, related_name='topic')
     subtopics = models.ForeignKey('Topic', on_delete=models.CASCADE, related_name='subtopics')
@@ -30,10 +28,7 @@ class TopicThroughTopic(OrderedModel):
     class Meta:
         ordering = ('topic', 'order',)
 
-class Skill(models.Model):
-    skillName = models.CharField(max_length=100, blank=False)
-    relatedTopics = models.ManyToManyField('Topic', through='TopicThroughSkill', blank=True)
-
+# defines a table for storing connections between the topics and skills for defining order
 class TopicThroughSkill(OrderedModel):
     skill = models.ForeignKey('Skill', on_delete=models.CASCADE, related_name='skill')
     topics = models.ForeignKey('Topic', on_delete=models.CASCADE, related_name='topics')
@@ -42,10 +37,7 @@ class TopicThroughSkill(OrderedModel):
     class Meta:
         ordering = ('skill', 'order',)
 
-class Superskill(models.Model):
-    superskillName = models.CharField(max_length=100, blank=False)
-    relatedSkills = models.ManyToManyField('Skill', through='SkillThroughSuperskill', blank=True)
-
+# defines a table for storing connections between the skills and superskills for defining order
 class SkillThroughSuperskill(OrderedModel):
     superskill = models.ForeignKey('Superskill', on_delete=models.CASCADE, related_name='superskill')
     skills = models.ForeignKey('Skill', on_delete=models.CASCADE, related_name='skills')
@@ -53,6 +45,34 @@ class SkillThroughSuperskill(OrderedModel):
 
     class Meta:
         ordering = ('superskill', 'order',)
+
+#--------------------------------------------------------------------------------------------------------------------
+# main models
+#--------------------------------------------------------------------------------------------------------------------
+
+# model to store the various weblinks/resources spread all over the internet
+class Resource(models.Model):
+    resourceName = models.CharField(max_length=100, blank=True)
+    link = models.TextField(blank=False)
+    # creator field
+    # relatedTopic = models.ForeignKey('Topic', on_delete=models.CASCADE, null=True)
+
+# model to cluster similar resources under a common heading
+# further the resources can be clustered into several sub-clusters under subtopic headings
+class Topic(models.Model):
+    topicName = models.CharField(max_length=100, blank=False)
+    relatedResources = models.ManyToManyField('Resource', through='ResourceThroughTopic', blank=True)
+    relatedTopics = models.ManyToManyField('self', through='TopicThroughTopic', blank=True, related_name='relatedTopics')
+
+# model that organises bigger topics under a common heading
+class Skill(models.Model):
+    skillName = models.CharField(max_length=100, blank=False)
+    relatedTopics = models.ManyToManyField('Topic', through='TopicThroughSkill', blank=True)
+
+# model that organises skills under an umbrella
+class Superskill(models.Model):
+    superskillName = models.CharField(max_length=100, blank=False)
+    relatedSkills = models.ManyToManyField('Skill', through='SkillThroughSuperskill', blank=True)
 
 
 

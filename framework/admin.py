@@ -2,6 +2,11 @@ from django.contrib import admin
 from .models import *
 from ordered_model.admin import OrderedModelAdmin, OrderedTabularInline, OrderedInlineModelAdminMixin
 
+#--------------------------------------------------------------------------------------------------------------------
+# XthroughY classes
+#--------------------------------------------------------------------------------------------------------------------
+
+# this class defines how the inline for the model 'ResourceThroughTopic' will look like
 class ResourceThroughTopicInline(OrderedTabularInline):
     model = ResourceThroughTopic
     list_display = ('resources', 'order',)
@@ -9,6 +14,8 @@ class ResourceThroughTopicInline(OrderedTabularInline):
     ordering = ('order',)
     extra = 0
 
+# this class defines how the inline for the model 'TopicThroughTopic' will look like
+# IMPORTANT NOTE: The attribute fk_name was necessary because the model 'TopicThroughTopic' has two foriegn keys to refer to the 'Topic' model
 class TopicThroughTopicInline(OrderedTabularInline):
     model = TopicThroughTopic
     fk_name = 'topic'
@@ -17,6 +24,7 @@ class TopicThroughTopicInline(OrderedTabularInline):
     ordering = ('order',)
     extra = 0
 
+# this class defines how the inline for the model 'TopicThroughSkill' will look like
 class TopicThroughSkillInline(OrderedTabularInline):
     model = TopicThroughSkill
     list_display = ('topics', 'order',)
@@ -24,6 +32,7 @@ class TopicThroughSkillInline(OrderedTabularInline):
     ordering = ('order',)
     extra = 0
 
+# this class defines how the inline for the model 'SkillThroughSuperskill' will look like
 class SkillThroughSuperskillInline(OrderedTabularInline):
     model = SkillThroughSuperskill
     list_display = ('skills', 'order',)
@@ -31,24 +40,33 @@ class SkillThroughSuperskillInline(OrderedTabularInline):
     ordering = ('order',)
     extra = 0
 
+#--------------------------------------------------------------------------------------------------------------------
+# Admin classes
+#--------------------------------------------------------------------------------------------------------------------
+
+# Admin for the 'Resource' model
 class ResourceAdmin(OrderedModelAdmin):
     list_display = ('link',)
 
+# Admin for the 'Topic' model
 class TopicAdmin(OrderedInlineModelAdminMixin, admin.ModelAdmin):
     model = Topic
     list_display = ('topicName',)
     inlines = (ResourceThroughTopicInline, TopicThroughTopicInline)
 
+# Admin for the 'Skill' model
 class SkillAdmin(OrderedInlineModelAdminMixin, admin.ModelAdmin):
     model = Skill
     list_display = ('skillName',)
     inlines = (TopicThroughSkillInline,)
 
+# Admin for the 'Superskill' model
 class SuperskillAdmin(OrderedInlineModelAdminMixin, admin.ModelAdmin):
     model = Superskill
     list_display = ('superskillName',)
     inlines = (SkillThroughSuperskillInline,)
 
+# admin.site.register for various models
 admin.site.register(Resource, ResourceAdmin)
 admin.site.register(Topic, TopicAdmin)
 admin.site.register(ResourceThroughTopic)
