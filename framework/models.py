@@ -7,6 +7,46 @@ from django.db import models
 from ordered_model.models import OrderedModel
 
 #--------------------------------------------------------------------------------------------------------------------
+# main models
+#--------------------------------------------------------------------------------------------------------------------
+
+# model to store the various weblinks/resources spread all over the internet
+class Resource(models.Model):
+    resourceName = models.CharField(max_length=100, blank=True)
+    link = models.TextField(blank=False)
+    # creator field
+    # relatedTopic = models.ForeignKey('Topic', on_delete=models.CASCADE, null=True)
+
+    def __str__(self):
+        return self.link
+
+# model to cluster similar resources under a common heading
+# further the resources can be clustered into several sub-clusters under subtopic headings
+class Topic(models.Model):
+    topicName = models.CharField(max_length=100, blank=False)
+    relatedResources = models.ManyToManyField('Resource', through='ResourceThroughTopic', blank=True)
+    relatedTopics = models.ManyToManyField('self', through='TopicThroughTopic', blank=True, related_name='relatedTopics')
+
+    def __str__(self):
+        return self.topicName
+
+# model that organises bigger topics under a common heading
+class Skill(models.Model):
+    skillName = models.CharField(max_length=100, blank=False)
+    relatedTopics = models.ManyToManyField('Topic', through='TopicThroughSkill', blank=True)
+
+    def __str__(self):
+        return self.skillName
+
+# model that organises skills under an umbrella
+class Superskill(models.Model):
+    superskillName = models.CharField(max_length=100, blank=False)
+    relatedSkills = models.ManyToManyField('Skill', through='SkillThroughSuperskill', blank=True)
+
+    def __str__(self):
+        return self.superskillName
+
+#--------------------------------------------------------------------------------------------------------------------
 # through models
 #--------------------------------------------------------------------------------------------------------------------
 
@@ -15,7 +55,7 @@ class ResourceThroughTopic(OrderedModel):
     topic = models.ForeignKey('Topic', on_delete=models.CASCADE)
     resources = models.ForeignKey('Resource', on_delete=models.CASCADE)
     order_with_respect_to = 'topic'
-
+    
     class Meta:
         ordering = ('topic', 'order',)
 
@@ -45,36 +85,6 @@ class SkillThroughSuperskill(OrderedModel):
 
     class Meta:
         ordering = ('superskill', 'order',)
-
-#--------------------------------------------------------------------------------------------------------------------
-# main models
-#--------------------------------------------------------------------------------------------------------------------
-
-# model to store the various weblinks/resources spread all over the internet
-class Resource(models.Model):
-    resourceName = models.CharField(max_length=100, blank=True)
-    link = models.TextField(blank=False)
-    # creator field
-    # relatedTopic = models.ForeignKey('Topic', on_delete=models.CASCADE, null=True)
-
-# model to cluster similar resources under a common heading
-# further the resources can be clustered into several sub-clusters under subtopic headings
-class Topic(models.Model):
-    topicName = models.CharField(max_length=100, blank=False)
-    relatedResources = models.ManyToManyField('Resource', through='ResourceThroughTopic', blank=True)
-    relatedTopics = models.ManyToManyField('self', through='TopicThroughTopic', blank=True, related_name='relatedTopics')
-
-# model that organises bigger topics under a common heading
-class Skill(models.Model):
-    skillName = models.CharField(max_length=100, blank=False)
-    relatedTopics = models.ManyToManyField('Topic', through='TopicThroughSkill', blank=True)
-
-# model that organises skills under an umbrella
-class Superskill(models.Model):
-    superskillName = models.CharField(max_length=100, blank=False)
-    relatedSkills = models.ManyToManyField('Skill', through='SkillThroughSuperskill', blank=True)
-
-
 
 
 
