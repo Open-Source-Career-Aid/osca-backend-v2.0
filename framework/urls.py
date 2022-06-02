@@ -4,6 +4,7 @@ from . import views
 urlpatterns = [
     path('get-all-resources/', views.getResources, name='getAllResources'),
     path('get-all-topics/', views.getTopics, name='getAllTopics'),
-    path('get-all-skills/', views.getSkills, name='getAllSkills'),
-    path('get-all-superskills/', views.getSuperskills, name='getAllSuperskills'),
+    path('get-all-throughs/', views.getThrough, name='getAllThroughs'),
+    # path('get-all-skills/', views.getSkills, name='getAllSkills'),
+    # path('get-all-superskills/', views.getSuperskills, name='getAllSuperskills'),
 ]

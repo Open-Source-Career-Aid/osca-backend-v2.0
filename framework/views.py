@@ -15,9 +15,13 @@ def getTopics(request):
     return JsonResponse(TopicSerializer(Topic.objects.all(), many=True).data, safe=False)
 
 @api_view(['GET'])
-def getSkills(request):
-    return JsonResponse(SkillSerializer(Skill.objects.all(), many=True).data, safe=False)
+def getThrough(request):
+    return JsonResponse(ThroughSerializer(ResourceThroughTopic.objects.all(), many=True).data, safe=False)
 
-@api_view(['GET'])
-def getSuperskills(request):
-    return JsonResponse(SuperskillSerializer(Superskill.objects.all(), many=True).data, safe=False)
+# @api_view(['GET'])
+# def getSkills(request):
+#     return JsonResponse(SkillSerializer(Skill.objects.all(), many=True).data, safe=False)
+
+# @api_view(['GET'])
+# def getSuperskills(request):
+#     return JsonResponse(SuperskillSerializer(Superskill.objects.all(), many=True).data, safe=False)

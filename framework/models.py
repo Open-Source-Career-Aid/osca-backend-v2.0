@@ -1,76 +1,97 @@
 from email.policy import default
-from tkinter import CASCADE
 from django.db import models
-from ordered_model.models import OrderedModelBase
+from ordered_model.models import OrderedModel
 
-# Create your models here.
-class Resource(OrderedModelBase):
-
-    # order model
-    sort_order = models.PositiveIntegerField(editable=False, db_index=True, null=True)
-    order_field_name = "sort_order"
-    # relatedTopic = models.ForeignKey('Topic', on_delete=models.CASCADE, null=True)
-    # order_with_respect_to = "relatedTopic"
-    topic = models.ForeignKey('Topic', on_delete=models.CASCADE, null=True)
-    class Meta:
-        ordering = ("sort_order",)
-
-    # resource data feilds
+class Resource(models.Model):
     link = models.TextField(blank=True)
-    def __str__(self):
-        return self.link
+    # relatedTopic = models.ForeignKey('Topic', on_delete=models.CASCADE, null=True)
 
-class Topic(OrderedModelBase):
+class Topic(OrderedModel):
+    topicName = models.CharField(max_length=100, blank=True)
+    relatedResources = models.ManyToManyField('Resource', through='ResourceThroughTopic', blank=True)
+    relatedTopics = models.ManyToManyField('self', through='TopicThroughTopic', blank=True, related_name='relatedTopics')
 
-    # order model
-    sort_order = models.PositiveIntegerField(editable=False, db_index=True, null=True)
-    order_field_name = "sort_order"
-    class Meta:
-        ordering = ("sort_order",)
-
-    # topic data fields
-    topic_name = models.CharField(max_length=100)
-    # subtopics = models.ManyToManyField("self", blank=True,  related_name="Subtopics", symmetrical=False)
-    # resources = models.ManyToManyField(Resource, blank=True)
-    def __str__(self):
-        return self.topic_name
-
-class ResourceToTopic(OrderedModelBase):
-
-    sort_order = models.PositiveIntegerField(editable=False, db_index=True, null=True)
-    order_field_name = "sort_order"
-    resource = models.ForeignKey('Resource', on_delete=models.CASCADE)
+class ResourceThroughTopic(OrderedModel):
     topic = models.ForeignKey('Topic', on_delete=models.CASCADE)
+    resources = models.ForeignKey('Resource', on_delete=models.CASCADE)
     order_with_respect_to = 'topic'
 
     class Meta:
-        ordering = ('topic', 'sort_order',)
+        ordering = ('topic', 'order',)
 
-class Skill(OrderedModelBase):
+class TopicThroughTopic(OrderedModel):
+    topic = models.ForeignKey('Topic', on_delete=models.CASCADE, related_name='topic')
+    subtopics = models.ForeignKey('Topic', on_delete=models.CASCADE, related_name='subtopics')
+    order_with_respect_to = 'topic'
+
+    class Meta:
+        ordering = ('topic', 'order',)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Create your models here.
+
+# class Resource(OrderedModel):
+
+#     topic = models.ForeignKey('Topic', on_delete=models.CASCADE, null=True)
+#     class Meta:
+#         ordering = ("order",)
+
+#     # resource data feilds
+#     link = models.TextField(blank=True)
+#     def __str__(self):
+#         return self.link
+
+# class Topic(OrderedModel):
+
+#     class Meta:
+#         ordering = ("order",)
+
+#     # topic data fields
+#     topic_name = models.CharField(max_length=100)
+#     # subtopics = models.ManyToManyField("self", blank=True,  related_name="Subtopics", symmetrical=False)
+#     # resources = models.ManyToManyField('Resource', blank=True)
+#     def __str__(self):
+#         return self.topic_name
+
+# # class ResourceToTopic(OrderedModel):
+
+# #     resource = models.ForeignKey('Resource', on_delete=models.CASCADE)
+# #     topic = models.ForeignKey('Topic', on_delete=models.CASCADE)
+# #     order_with_respect_to = 'topic'
+
+# #     class Meta:
+# #         ordering = ('topic', 'order',)
+
+# class Skill(OrderedModel):
   
-    # order model
-    sort_order = models.PositiveIntegerField(editable=False, db_index=True, null=True)
-    order_field_name = "sort_order"
-    class Meta:
-        ordering = ("sort_order",)
+#     class Meta:
+#         ordering = ("order",)
 
-    # skill data fields
-    skill_name = models.CharField(max_length=100)
-    topics = models.ManyToManyField(Topic, related_name="subskill_topics", blank=True)
-    subskills = models.ManyToManyField("self", blank=True, related_name="subskills_under_subskill", symmetrical=False)
-    def __str__(self):
-        return self.skill_name
+#     # skill data fields
+#     skill_name = models.CharField(max_length=100)
+#     topics = models.ManyToManyField(Topic, related_name="subskill_topics", blank=True)
+#     subskills = models.ManyToManyField("self", blank=True, related_name="subskills_under_subskill", symmetrical=False)
+#     def __str__(self):
+#         return self.skill_name
 
-class Superskill(models.Model):
-
-    # order model
-    sort_order = models.PositiveIntegerField(editable=False, db_index=True, null=True)
-    order_field_name = "sort_order"
-    class Meta:
-        ordering = ("sort_order",)
+# class Superskill(models.Model):
     
-    # superskill data fields
-    superskill_name = models.CharField(max_length=100)
-    Skills = models.ManyToManyField(Skill, related_name="super_skill", blank=True)
-    def __str__(self):
-        return self.superskill_name
+#     # superskill data fields
+#     superskill_name = models.CharField(max_length=100)
+#     Skills = models.ManyToManyField(Skill, related_name="super_skill", blank=True)
+#     def __str__(self):
+#         return self.superskill_name

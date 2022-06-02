@@ -10,17 +10,31 @@ class ResourceSerializer(serializers.ModelSerializer):
 class TopicSerializer(serializers.ModelSerializer):
     class Meta:
         model = Topic
-        fields = '__all__'
+        fields = ['id', 'topicName', 'relatedResources']
         depth = 1
 
-class SkillSerializer(serializers.ModelSerializer):
+class ThroughSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Skill
-        fields = '__all__'
+        model = ResourceThroughTopic
+        fields = ['order', 'topic', 'resources']
+        depth = 0
+
+# returning the ordered list for resources according to topic
+
+class ResourceThroughTopicSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ResourceThroughTopic
+        fields = ['topic', 'resources']
         depth = 1
 
-class SuperskillSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Superskill
-        fields = '__all__'
-        depth = 1
+# class SkillSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Skill
+#         fields = '__all__'
+#         depth = 1
+
+# class SuperskillSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Superskill
+#         fields = '__all__'
+#         depth = 1
