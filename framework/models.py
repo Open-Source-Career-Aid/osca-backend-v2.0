@@ -1,13 +1,16 @@
+from colorsys import ONE_THIRD
 from email.policy import default
+from tkinter import CASCADE
+from turtle import onclick
 from django.db import models
 from ordered_model.models import OrderedModel
 
 class Resource(models.Model):
-    link = models.TextField(blank=True)
+    link = models.TextField(blank=False)
     # relatedTopic = models.ForeignKey('Topic', on_delete=models.CASCADE, null=True)
 
-class Topic(OrderedModel):
-    topicName = models.CharField(max_length=100, blank=True)
+class Topic(models.Model):
+    topicName = models.CharField(max_length=100, blank=False)
     relatedResources = models.ManyToManyField('Resource', through='ResourceThroughTopic', blank=True)
     relatedTopics = models.ManyToManyField('self', through='TopicThroughTopic', blank=True, related_name='relatedTopics')
 
@@ -27,11 +30,29 @@ class TopicThroughTopic(OrderedModel):
     class Meta:
         ordering = ('topic', 'order',)
 
+class Skill(models.Model):
+    skillName = models.CharField(max_length=100, blank=False)
+    relatedTopics = models.ManyToManyField('Topic', through='TopicThroughSkill', blank=True)
 
+class TopicThroughSkill(OrderedModel):
+    skill = models.ForeignKey('Skill', on_delete=models.CASCADE, related_name='skill')
+    topics = models.ForeignKey('Topic', on_delete=models.CASCADE, related_name='topics')
+    order_with_respect_to = 'skill'
 
+    class Meta:
+        ordering = ('skill', 'order',)
 
+class Superskill(models.Model):
+    superskillName = models.CharField(max_length=100, blank=False)
+    relatedSkills = models.ManyToManyField('Skill', through='SkillThroughSuperskill', blank=True)
 
+class SkillThroughSuperskill(OrderedModel):
+    superskill = models.ForeignKey('Superskill', on_delete=models.CASCADE, related_name='superskill')
+    skills = models.ForeignKey('Skill', on_delete=models.CASCADE, related_name='skills')
+    order_with_respect_to = 'superskill'
 
+    class Meta:
+        ordering = ('superskill', 'order',)
 
 
 

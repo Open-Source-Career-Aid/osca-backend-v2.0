@@ -17,6 +17,20 @@ class TopicThroughTopicInline(OrderedTabularInline):
     ordering = ('order',)
     extra = 0
 
+class TopicThroughSkillInline(OrderedTabularInline):
+    model = TopicThroughSkill
+    list_display = ('topics', 'order',)
+    readonly_fields = ('order',)
+    ordering = ('order',)
+    extra = 0
+
+class SkillThroughSuperskillInline(OrderedTabularInline):
+    model = SkillThroughSuperskill
+    list_display = ('skills', 'order',)
+    readonly_fields = ('order',)
+    ordering = ('order',)
+    extra = 0
+
 class ResourceAdmin(OrderedModelAdmin):
     list_display = ('link',)
 
@@ -25,11 +39,21 @@ class TopicAdmin(OrderedInlineModelAdminMixin, admin.ModelAdmin):
     list_display = ('topicName',)
     inlines = (ResourceThroughTopicInline, TopicThroughTopicInline)
 
+class SkillAdmin(OrderedInlineModelAdminMixin, admin.ModelAdmin):
+    model = Skill
+    list_display = ('skillName',)
+    inlines = (TopicThroughSkillInline,)
+
+class SuperskillAdmin(OrderedInlineModelAdminMixin, admin.ModelAdmin):
+    model = Superskill
+    list_display = ('superskillName',)
+    inlines = (SkillThroughSuperskillInline,)
+
 admin.site.register(Resource, ResourceAdmin)
 admin.site.register(Topic, TopicAdmin)
 admin.site.register(ResourceThroughTopic)
-
-
+admin.site.register(Skill, SkillAdmin)
+admin.site.register(Superskill, SuperskillAdmin)
 
 
 
