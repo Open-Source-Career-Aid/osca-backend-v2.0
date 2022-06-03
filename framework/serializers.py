@@ -12,7 +12,7 @@ class ThroughSerializer(serializers.ModelSerializer):
 class ResourceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Resource
-        fields = ['id', 'link', 'orderwrttopic']
+        fields = ['id', 'link']
 
 class TopicSerializer(serializers.ModelSerializer):
     class Meta:
