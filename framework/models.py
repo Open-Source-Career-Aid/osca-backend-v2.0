@@ -14,6 +14,7 @@ from ordered_model.models import OrderedModel
 class Resource(models.Model):
     resourceName = models.CharField(max_length=100, blank=True)
     link = models.TextField(blank=False)
+    # orderwrttopic = models.IntegerField(null=True)
     # creator field
     # relatedTopic = models.ForeignKey('Topic', on_delete=models.CASCADE, null=True)
 
@@ -55,7 +56,7 @@ class ResourceThroughTopic(OrderedModel):
     topic = models.ForeignKey('Topic', on_delete=models.CASCADE)
     resources = models.ForeignKey('Resource', on_delete=models.CASCADE)
     order_with_respect_to = 'topic'
-    
+
     class Meta:
         ordering = ('topic', 'order',)
 
